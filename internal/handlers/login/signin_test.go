@@ -53,7 +53,7 @@ func TestHConfig_Login(t *testing.T) {
 			}
 			pas, _ := hash.HashPassword(tt.realP)
 			stor := &model.UserInfo{Login: tt.user.Info.Login, Password: pas}
-			mockUserService := new(storage.MockStor)
+			mockUserService := new(storage.TestStore)
 			mockUserService.On("findByLogin", mock.AnythingOfType("*context.emptyCtx"), mock.AnythingOfType("*string")).Return(stor, nil)
 			rr := httptest.NewRecorder()
 			storage.InitTestStorage(mockUserService)

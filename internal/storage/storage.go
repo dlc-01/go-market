@@ -30,7 +30,7 @@ func InitDBStorage(ctx context.Context, cfg *config.ServerConfig) error {
 	return nil
 }
 
-func InitTestStorage(m *MockStor) {
+func InitTestStorage(m *TestStore) {
 	stor = m
 }
 

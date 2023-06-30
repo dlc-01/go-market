@@ -72,7 +72,7 @@ func TestHConfig_SingUP2(t *testing.T) {
 				log.Fatal(err)
 			}
 
-			mockUserService := new(storage.MockStor)
+			mockUserService := new(storage.TestStore)
 			mockUserService.On("createUser", mock.AnythingOfType("*gin.Context"), mock.AnythingOfType("*model.UserInfo")).Return(tt.userS, nil)
 			rr := httptest.NewRecorder()
 

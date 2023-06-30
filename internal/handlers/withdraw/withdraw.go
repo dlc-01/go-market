@@ -61,7 +61,7 @@ func WithdrawalOfFunds(ginC *gin.Context) {
 	var acc float64 = 0
 	mapOrd := make([]model.Order, 1)
 	mapOrd[0] = model.Order{
-		Id:          req.Order,
+		ID:          req.Order,
 		Status:      model.PROCESSED,
 		Accrual:     &acc,
 		TimeCreated: time.Now(),
