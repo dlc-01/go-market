@@ -27,7 +27,7 @@ var db UserStorage = &dbStor{}
 func (d dbStor) createStor(ctx context.Context, cfg *config.ServerConfig) (UserStorage, error) {
 	var err error
 
-	d.Pool, err = pgxpool.New(ctx, cfg.DbAddress)
+	d.Pool, err = pgxpool.New(ctx, cfg.DBAddress)
 	if err != nil {
 		return d, fmt.Errorf("cannot connect to db: %w ", err)
 	}
@@ -113,7 +113,7 @@ func (d dbStor) addNewOrder(ctx context.Context, u *model.User) error {
 		return err
 	}
 	order := u.Orders[0]
-	err := d.QueryRow(ctx, "INSERT INTO market_orders (id, client, status, accrual, time_created) VALUES ($1, $2, $3, $4, $5)", order.Id, u.Info.Login, order.Status, order.Accrual, order.TimeCreated).Scan()
+	err := d.QueryRow(ctx, "INSERT INTO market_orders (id, client, status, accrual, time_created) VALUES ($1, $2, $3, $4, $5)", order.ID, u.Info.Login, order.Status, order.Accrual, order.TimeCreated).Scan()
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
@@ -127,7 +127,7 @@ func (d dbStor) addNewOrder(ctx context.Context, u *model.User) error {
 func (d dbStor) checkUniqOrder(ctx context.Context, u *model.User) error {
 	order := u.Orders[0]
 	var clientFromDB string
-	err := d.QueryRow(ctx, "SELECT client FROM market_orders WHERE id = $1", order.Id).Scan(&clientFromDB)
+	err := d.QueryRow(ctx, "SELECT client FROM market_orders WHERE id = $1", order.ID).Scan(&clientFromDB)
 	if err != nil {
 		if pgx.ErrNoRows != err {
 			return fmt.Errorf("error while checking orders : %w", err)
@@ -154,7 +154,7 @@ func (d dbStor) getAllOrdersByLogin(ctx context.Context, login *string) (*model.
 
 	for col.Next() {
 		order := model.Order{}
-		if err := col.Scan(&order.Id, &order.Status, &order.Accrual, &order.TimeCreated); err != nil {
+		if err := col.Scan(&order.ID, &order.Status, &order.Accrual, &order.TimeCreated); err != nil {
 			return &u, fmt.Errorf("error file scanning resp from db: %w", err)
 		}
 		orders = append(orders, order)

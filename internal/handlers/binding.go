@@ -56,5 +56,4 @@ func BindData(ginC *gin.Context, req interface{}) {
 		return
 	}
 
-	return
 }

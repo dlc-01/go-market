@@ -93,7 +93,7 @@ func NewConflict(value string) *Error {
 func NewInternal() *Error {
 	return &Error{
 		TypCode: Internal,
-		Message: fmt.Sprintf("Internal server error."),
+		Message: fmt.Sprint("Internal server error."),
 	}
 }
 
@@ -107,7 +107,7 @@ func NewNotFound(name string, value string) *Error {
 func NewServiceUnavailable() *Error {
 	return &Error{
 		TypCode: ServiceUnavailable,
-		Message: fmt.Sprintf("Service unavailable or timed out"),
+		Message: fmt.Sprint("Service unavailable or timed out"),
 	}
 }
 

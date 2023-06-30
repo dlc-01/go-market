@@ -16,7 +16,7 @@ func Login(ginC *gin.Context) {
 
 	handlers.BindData(ginC, &req)
 
-	u := &model.UserInfo{Login: req.Username, Password: req.Password}
+	u := &model.UserInfo{Login: req.Username}
 
 	u, err := storage.FindByLogin(ginC.Request.Context(), &u.Login)
 	if err != nil {
