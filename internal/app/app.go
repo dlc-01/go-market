@@ -26,9 +26,8 @@ func Run(cfg *config.ServerConfig) {
 
 	router.Use(auth.AuthMidlleware())
 
-	order := router.Group("/")
-	order.POST("/api/user/orders", orders.NewOrder)
-	order.GET("/api/user/orders", orders.GetAllOrders)
+	router.POST("/api/user/orders", orders.NewOrder)
+	router.GET("/api/user/orders", orders.GetAllOrders)
 
 	router.GET("/api/user/balance", balance.ShowBalance)
 	router.POST("/api/user/balance/withdraw", withdraw.WithdrawalOfFunds)
