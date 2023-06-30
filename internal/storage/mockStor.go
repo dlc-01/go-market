@@ -5,12 +5,14 @@ import (
 	"github.com/dlc/go-market/internal/config"
 	"github.com/dlc/go-market/internal/model"
 	"github.com/dlc/go-market/internal/model/apperrors"
+	"sync"
 
 	"github.com/stretchr/testify/mock"
 )
 
 type TestStore struct {
 	mock.Mock
+	sync.Mutex
 }
 
 func (m TestStore) createStor(ctx context.Context, cfg *config.ServerConfig) (UserStorage, error) {

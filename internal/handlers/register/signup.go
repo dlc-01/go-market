@@ -1,13 +1,13 @@
 package register
 
 import (
+	"github.com/dlc/go-market/internal/auth"
 	"github.com/dlc/go-market/internal/handlers"
 	"github.com/dlc/go-market/internal/logger"
+	"github.com/dlc/go-market/internal/model"
 	"github.com/dlc/go-market/internal/model/apperrors"
 	"github.com/dlc/go-market/internal/storage"
 	"net/http"
-
-	"github.com/dlc/go-market/internal/model"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,6 +28,7 @@ func Register(ginC *gin.Context) {
 		return
 	}
 
-	ginC.AbortWithStatus(http.StatusCreated)
+	auth.SetToken(ginC, u)
+	ginC.AbortWithStatus(http.StatusOK)
 
 }
