@@ -14,5 +14,5 @@ type UserInfo struct {
 
 type AuthReq struct {
 	Username string `json:"login" binding:"required"`
-	Password string `json:"password" binding:"required,gte=6,lte=30"`
+	Password string `json:"password" binding:"required"`
 }
