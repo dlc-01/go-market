@@ -32,7 +32,6 @@ func GetAllWithdraws(ginC *gin.Context) {
 		return
 	}
 
-	ginC.Request.Header.Set("Content-Type", "application/json")
 	ginC.AbortWithStatusJSON(apperrors.Status(apperrors.NewStatusOK()), &u.Withdraws)
 
 }

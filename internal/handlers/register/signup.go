@@ -7,8 +7,6 @@ import (
 	"github.com/dlc/go-market/internal/model"
 	"github.com/dlc/go-market/internal/model/apperrors"
 	"github.com/dlc/go-market/internal/storage"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,6 +27,6 @@ func Register(ginC *gin.Context) {
 	}
 
 	auth.SetToken(ginC, u)
-	ginC.AbortWithStatus(http.StatusOK)
+	ginC.AbortWithStatus(apperrors.Status(apperrors.NewStatusOK()))
 
 }
