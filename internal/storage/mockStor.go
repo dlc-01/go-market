@@ -73,7 +73,7 @@ func (m TestStore) getAllOrdersByLogin(ctx context.Context, login *string) (*mod
 	return r0, nil
 }
 
-func (m TestStore) addNewOrder(ctx context.Context, u *model.User) error {\
+func (m TestStore) addNewOrder(ctx context.Context, u *model.User) error {
 	m.Mutex.Lock()
 	ret := m.Called(ctx, u)
 
