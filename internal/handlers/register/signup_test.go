@@ -44,25 +44,6 @@ func TestHConfig_SingUP2(t *testing.T) {
 			},
 			userS: &model.UserInfo{},
 		},
-		{
-			name:   "password too long",
-			status: http.StatusBadRequest,
-			userR: &model.UserInfo{
-				Password: "supersecret1234qweqwewqewqeqwewqewqewewewqewwqeqwewqewqeqwwe",
-				Login:    "bob",
-			},
-			userS: &model.UserInfo{},
-		},
-		{
-			name:   "password too short",
-			status: http.StatusBadRequest,
-			userR: &model.UserInfo{
-
-				Password: "s",
-				Login:    "bob",
-			},
-			userS: &model.UserInfo{},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

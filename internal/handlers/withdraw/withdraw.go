@@ -30,6 +30,7 @@ func WithdrawalOfFunds(ginC *gin.Context) {
 		ginC.AbortWithStatusJSON(apperrors.Status(err), gin.H{
 			"error": err,
 		})
+		return
 	}
 
 	log, err := handlers.GetLogin(ginC)

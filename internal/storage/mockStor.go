@@ -53,32 +53,83 @@ func (m TestStore) findByLogin(ctx context.Context, login *string) (*model.UserI
 	return r0, r1
 }
 func (m TestStore) getAllOrdersByLogin(ctx context.Context, login *string) (*model.User, error) {
-	//TODO implement me
-	panic("implement me")
+	ret := m.Called(ctx, login)
+
+	var r0 *model.User
+	if ret.Get(0) != nil {
+		r0 = ret.Get(0).(*model.User)
+	}
+	if len(r0.Orders) == 0 {
+		return r0, apperrors.NewNoContent()
+	}
+
+	return r0, nil
 }
 
 func (m TestStore) addNewOrder(ctx context.Context, u *model.User) error {
-	return nil
+	ret := m.Called(ctx, u)
+
+	var r0 *model.User
+	if ret.Get(0) != nil {
+		r0 = ret.Get(0).(*model.User)
+	}
+	var r1 error
+	if r0.Info.Login == "" && len(r0.Orders) == 0 {
+		r1 = apperrors.NewAccepted()
+	} else if r0.Info.Login == u.Info.Login && r0.Orders[0].ID == u.Orders[0].ID {
+		r1 = apperrors.NewStatusOK()
+	} else if r0.Info.Login != u.Info.Login && r0.Orders[0].ID == u.Orders[0].ID {
+		r1 = apperrors.NewConflict("")
+	}
+
+	return r1
 }
 
 func (m TestStore) getBalanceWithdraw(ctx context.Context, login *string) (*model.BalanceResp, error) {
-	//TODO implement me
-	panic("implement me")
+	ret := m.Called(ctx, login)
+
+	var r0 *model.BalanceResp
+	if ret.Get(0) != nil {
+		r0 = ret.Get(0).(*model.BalanceResp)
+	}
+
+	var r1 error
+
+	if ret.Get(1) != nil {
+		r1 = ret.Get(1).(error)
+	}
+
+	return r0, r1
 }
 
 func (m TestStore) getUBalance(ctx context.Context, login *string) (float64, error) {
-	//TODO implement me
-	panic("implement me")
+	ret := m.Called(ctx, login)
+
+	var r0 float64
+	if ret.Get(0) != nil {
+		r0 = ret.Get(0).(float64)
+	}
+
+	return r0, nil
 }
 
 func (m TestStore) getAllWithdrawsByLogin(ctx context.Context, login *string) (*model.User, error) {
-	//TODO implement me
-	panic("implement me")
+	ret := m.Called(ctx, login)
+
+	var r0 *model.User
+	if ret.Get(0) != nil {
+		r0 = ret.Get(0).(*model.User)
+	}
+	if len(r0.Withdraws) == 0 {
+		return r0, apperrors.NewNoContent()
+	}
+
+	return r0, nil
+
 }
 
 func (m TestStore) addNewOderWithdraw(ctx context.Context, u *model.User) error {
-	//TODO implement me
-	panic("implement me")
+	return apperrors.NewAccepted()
 }
 
 var mockS UserStorage = TestStore{}
