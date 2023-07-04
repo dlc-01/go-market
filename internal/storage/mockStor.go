@@ -5,9 +5,8 @@ import (
 	"github.com/dlc/go-market/internal/config"
 	"github.com/dlc/go-market/internal/model"
 	"github.com/dlc/go-market/internal/model/apperrors"
-	"sync"
-
 	"github.com/stretchr/testify/mock"
+	"sync"
 )
 
 type TestStore struct {
@@ -15,11 +14,11 @@ type TestStore struct {
 	sync.Mutex
 }
 
-func (m TestStore) createStor(ctx context.Context, cfg *config.ServerConfig) (UserStorage, error) {
+func (m *TestStore) CreateStor(ctx context.Context, cfg *config.ServerConfig) (UserStorage, error) {
 	return mockS, nil
 }
 
-func (m TestStore) createUser(ctx context.Context, u *model.UserInfo) error {
+func (m *TestStore) CreateUser(ctx context.Context, u *model.UserInfo) error {
 	ret := m.Called(ctx, u)
 	var r0 error
 	if ret != nil {
@@ -36,7 +35,7 @@ func (m TestStore) createUser(ctx context.Context, u *model.UserInfo) error {
 	return r0
 }
 
-func (m TestStore) findByLogin(ctx context.Context, login *string) (*model.UserInfo, error) {
+func (m *TestStore) FindByLogin(ctx context.Context, login *string) (*model.UserInfo, error) {
 	ret := m.Called(ctx, login)
 
 	var r0 *model.UserInfo
@@ -52,7 +51,7 @@ func (m TestStore) findByLogin(ctx context.Context, login *string) (*model.UserI
 
 	return r0, r1
 }
-func (m TestStore) getAllOrdersByLogin(ctx context.Context, login *string) (*model.User, error) {
+func (m *TestStore) GetAllOrdersByLogin(ctx context.Context, login *string) (*model.User, error) {
 	ret := m.Called(ctx, login)
 
 	var r0 *model.User
@@ -66,7 +65,7 @@ func (m TestStore) getAllOrdersByLogin(ctx context.Context, login *string) (*mod
 	return r0, nil
 }
 
-func (m TestStore) addNewOrder(ctx context.Context, u *model.User) error {
+func (m *TestStore) AddNewOrder(ctx context.Context, u *model.User) error {
 	ret := m.Called(ctx, u)
 
 	var r0 *model.User
@@ -85,7 +84,7 @@ func (m TestStore) addNewOrder(ctx context.Context, u *model.User) error {
 	return r1
 }
 
-func (m TestStore) getBalanceWithdraw(ctx context.Context, login *string) (*model.BalanceResp, error) {
+func (m *TestStore) GetBalanceWithdraw(ctx context.Context, login *string) (*model.BalanceResp, error) {
 	ret := m.Called(ctx, login)
 
 	var r0 *model.BalanceResp
@@ -102,7 +101,7 @@ func (m TestStore) getBalanceWithdraw(ctx context.Context, login *string) (*mode
 	return r0, r1
 }
 
-func (m TestStore) getUBalance(ctx context.Context, login *string) (float64, error) {
+func (m *TestStore) GetUBalance(ctx context.Context, login *string) (float64, error) {
 	ret := m.Called(ctx, login)
 
 	var r0 float64
@@ -113,7 +112,7 @@ func (m TestStore) getUBalance(ctx context.Context, login *string) (float64, err
 	return r0, nil
 }
 
-func (m TestStore) getAllWithdrawsByLogin(ctx context.Context, login *string) (*model.User, error) {
+func (m *TestStore) GetAllWithdrawsByLogin(ctx context.Context, login *string) (*model.User, error) {
 	ret := m.Called(ctx, login)
 
 	var r0 *model.User
@@ -128,8 +127,17 @@ func (m TestStore) getAllWithdrawsByLogin(ctx context.Context, login *string) (*
 
 }
 
-func (m TestStore) addNewOderWithdraw(ctx context.Context, u *model.User) error {
+func (m *TestStore) AddNewOderWithdraw(ctx context.Context, u *model.User) error {
 	return apperrors.NewAccepted()
 }
+func (m *TestStore) CollectOrders(ctx context.Context) ([]model.Order, error) {
+	return nil, nil
+}
+func (m *TestStore) UpdateOrders(ctx context.Context, order model.Order) error {
+	return nil
+}
+func (m *TestStore) Close(ctx context.Context) {
 
-var mockS UserStorage = TestStore{}
+}
+
+var mockS UserStorage = &TestStore{}

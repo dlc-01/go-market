@@ -9,20 +9,20 @@ import (
 )
 
 type invalidArgument struct {
-	Field string `json:"field"`
-	Value string `json:"value"`
-	Tag   string `json:"tag"`
-	Param string `json:"param"`
+	Field string
+	Value string
+	Tag   string
+	Param string
 }
 
-func BindData(ginC *gin.Context, req interface{}) {
+func BindData(ginC *gin.Context, req interface{}) (error, []invalidArgument) {
 
 	if err := CheckContentType(ginC, "application/json"); err != nil {
-		logger.Error(" content type not support")
+
 		ginC.AbortWithStatusJSON(apperrors.Status(err), gin.H{
 			"error": err,
 		})
-		return
+		return apperrors.NewUnsupportedMediaType("content type not support"), []invalidArgument{}
 	}
 
 	if err := ginC.ShouldBind(req); err != nil {
@@ -41,19 +41,10 @@ func BindData(ginC *gin.Context, req interface{}) {
 				})
 			}
 
-			err := apperrors.NewBadRequest("Invalid request parameters. See invalidArgs")
-
-			ginC.AbortWithStatusJSON(err.Status(), gin.H{
-				"error":       err,
-				"invalidArgs": invalidArgs,
-			})
-			return
+			return apperrors.NewBadRequest("Invalid request parameters. See invalidArgs"), invalidArgs
 		}
 
-		fallBack := apperrors.NewInternal()
-
-		ginC.AbortWithStatusJSON(fallBack.Status(), gin.H{"error": fallBack})
-		return
+		return apperrors.NewInternal(), []invalidArgument{}
 	}
-
+	return nil, []invalidArgument{}
 }

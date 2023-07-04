@@ -8,12 +8,27 @@ import (
 	"github.com/dlc/go-market/internal/model/apperrors"
 	"github.com/dlc/go-market/internal/storage"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func Register(ginC *gin.Context) {
 	var req model.AuthReq
 	var err error
-	handlers.BindData(ginC, &req)
+	if err, invalidArgs := handlers.BindData(ginC, &req); err != nil {
+		logger.Infof("cannot bind data %s", err)
+		if apperrors.Status(err) == http.StatusBadRequest {
+			ginC.AbortWithStatusJSON(apperrors.Status(err), gin.H{
+				"error":       err,
+				"InvalidArgs": invalidArgs,
+			})
+		} else {
+			ginC.AbortWithStatusJSON(apperrors.Status(err), gin.H{
+				"error": err,
+			})
+		}
+
+		return
+	}
 
 	u := model.UserInfo{Password: req.Password, Login: req.Username}
 

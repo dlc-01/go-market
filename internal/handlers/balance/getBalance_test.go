@@ -60,7 +60,7 @@ func TestGetBalance(t *testing.T) {
 			}
 
 			mockUserService := new(storage.TestStore)
-			mockUserService.On("getBalanceWithdraw", mock.AnythingOfType("*gin.Context"), mock.AnythingOfType("*string")).Return(tt.balanceStor, nil)
+			mockUserService.On("GetBalanceWithdraw", mock.AnythingOfType("*gin.Context"), mock.AnythingOfType("*string")).Return(tt.balanceStor, nil)
 
 			rr := httptest.NewRecorder()
 			storage.InitTestStorage(mockUserService)

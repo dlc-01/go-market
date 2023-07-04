@@ -8,13 +8,28 @@ import (
 	"github.com/dlc/go-market/internal/model/apperrors"
 	"github.com/dlc/go-market/internal/storage"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"time"
 )
 
 func WithdrawalOfFunds(ginC *gin.Context) {
 	req := model.Withdraw{TimeCreated: time.Now()}
 
-	handlers.BindData(ginC, &req)
+	if err, invalidArgs := handlers.BindData(ginC, &req); err != nil {
+		logger.Infof("cannot bind data %s", err)
+		if apperrors.Status(err) == http.StatusBadRequest {
+			ginC.AbortWithStatusJSON(apperrors.Status(err), gin.H{
+				"error":       err,
+				"InvalidArgs": invalidArgs,
+			})
+		} else {
+			ginC.AbortWithStatusJSON(apperrors.Status(err), gin.H{
+				"error": err,
+			})
+		}
+
+		return
+	}
 
 	if err := luhn.ValidIDErr(req.Order); err != nil {
 		if apperrors.Status(err) == 500 {
@@ -59,12 +74,11 @@ func WithdrawalOfFunds(ginC *gin.Context) {
 		return
 	}
 
-	var acc float64 = 0
 	mapOrd := make([]model.Order, 1)
 	mapOrd[0] = model.Order{
 		ID:          req.Order,
 		Status:      model.PROCESSED,
-		Accrual:     &acc,
+		Accrual:     0,
 		TimeCreated: time.Now(),
 	}
 

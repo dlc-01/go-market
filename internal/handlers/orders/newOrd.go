@@ -53,12 +53,11 @@ func NewOrder(ginC *gin.Context) {
 		return
 	}
 
-	var acc float64 = 0
 	mapOrd := make([]model.Order, 1)
 	mapOrd[0] = model.Order{
 		ID:          orderS,
 		Status:      model.NEW,
-		Accrual:     &acc,
+		Accrual:     0,
 		TimeCreated: time.Now(),
 	}
 	u := model.User{Info: model.UserInfo{Login: log}, Orders: mapOrd}

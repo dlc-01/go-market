@@ -85,7 +85,7 @@ func TestAddNewStore(t *testing.T) {
 			}
 
 			mockUserService := new(storage.TestStore)
-			mockUserService.On("addNewOrder", mock.AnythingOfType("*gin.Context"), mock.AnythingOfType("*model.User")).Return(tt.userS, nil)
+			mockUserService.On("AddNewOrder", mock.AnythingOfType("*gin.Context"), mock.AnythingOfType("*model.User")).Return(tt.userS, nil)
 
 			rr := httptest.NewRecorder()
 			storage.InitTestStorage(mockUserService)

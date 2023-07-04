@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/dlc/go-market/internal/accrual"
 	"github.com/dlc/go-market/internal/app"
 	"github.com/dlc/go-market/internal/config"
 	"github.com/dlc/go-market/internal/logger"
@@ -10,13 +11,21 @@ import (
 )
 
 func main() {
-	cfg := config.ParseFlagOs()
+	cfg, err := config.ParseFlagOs()
+	if err != nil {
+		log.Fatal(err)
+	}
 	if err := logger.InitLogger(); err != nil {
 		log.Fatal(err)
 	}
-	err := storage.InitDBStorage(context.Background(), cfg)
-	if err != nil {
+
+	if err := storage.InitDBStorage(context.Background(), cfg); err != nil {
 		logger.Fatalf("error while  init storage: %s", err)
 	}
+
+	go accrual.ListenOtherServ(context.Background(), cfg)
+
 	app.Run(cfg)
+
+	storage.Close(context.Background())
 }

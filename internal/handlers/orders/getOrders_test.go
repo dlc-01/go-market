@@ -61,7 +61,7 @@ func TestGetAllOrders(t *testing.T) {
 			}
 
 			mockUserService := new(storage.TestStore)
-			mockUserService.On("getAllOrdersByLogin", mock.AnythingOfType("*gin.Context"), mock.AnythingOfType("*string")).Return(tt.userS, nil)
+			mockUserService.On("GetAllOrdersByLogin", mock.AnythingOfType("*gin.Context"), mock.AnythingOfType("*string")).Return(tt.userS, nil)
 
 			rr := httptest.NewRecorder()
 			storage.InitTestStorage(mockUserService)

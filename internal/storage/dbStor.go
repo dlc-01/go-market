@@ -24,20 +24,20 @@ const migrationWithdrawsTable = "CREATE TABLE IF NOT EXISTS market_withdraws (cl
 
 var db UserStorage = &dbStor{}
 
-func (d dbStor) createStor(ctx context.Context, cfg *config.ServerConfig) (UserStorage, error) {
+func (d dbStor) CreateStor(ctx context.Context, cfg *config.ServerConfig) (UserStorage, error) {
 	var err error
 
 	d.Pool, err = pgxpool.New(ctx, cfg.DBAddress)
 	if err != nil {
-		return d, fmt.Errorf("cannot connect to db: %w ", err)
+		return &d, fmt.Errorf("cannot connect to db: %w ", err)
 	}
 	if err = d.Ping(ctx); err != nil {
-		return d, fmt.Errorf("error while try to ping db: %w", err)
+		return &d, fmt.Errorf("error while try to ping db: %w", err)
 	}
 	if _, err = d.migration(ctx); err != nil {
 		return nil, fmt.Errorf("cannot create migration %w", err)
 	}
-	return d, nil
+	return &d, nil
 
 }
 func (d dbStor) migration(ctx context.Context) (UserStorage, error) {
@@ -57,11 +57,11 @@ func (d dbStor) migration(ctx context.Context) (UserStorage, error) {
 		return nil, fmt.Errorf("cannot create migration withdraws table %w", err)
 	}
 
-	return d, nil
+	return &d, nil
 
 }
 
-func (d dbStor) createUser(ctx context.Context, u *model.UserInfo) error {
+func (d dbStor) CreateUser(ctx context.Context, u *model.UserInfo) error {
 	var err error
 	u.Password, err = hash.HashPassword(u.Password)
 	if err != nil {
@@ -97,7 +97,7 @@ func (d dbStor) createBalance(ctx context.Context, login string) error {
 	return nil
 }
 
-func (d dbStor) findByLogin(ctx context.Context, login *string) (*model.UserInfo, error) {
+func (d dbStor) FindByLogin(ctx context.Context, login *string) (*model.UserInfo, error) {
 	resU := model.UserInfo{}
 	err := d.QueryRow(ctx, "SELECT * FROM market_users WHERE username=$1", login).Scan(&resU.Login, &resU.Password)
 	if err != nil {
@@ -108,8 +108,8 @@ func (d dbStor) findByLogin(ctx context.Context, login *string) (*model.UserInfo
 	}
 	return &resU, nil
 }
-func (d dbStor) addNewOrder(ctx context.Context, u *model.User) error {
-	if err := d.checkUniqOrder(ctx, u); err != nil {
+func (d dbStor) AddNewOrder(ctx context.Context, u *model.User) error {
+	if err := d.CheckUniqOrder(ctx, u); err != nil {
 		return err
 	}
 	order := u.Orders[0]
@@ -124,7 +124,7 @@ func (d dbStor) addNewOrder(ctx context.Context, u *model.User) error {
 	return apperrors.NewAccepted()
 
 }
-func (d dbStor) checkUniqOrder(ctx context.Context, u *model.User) error {
+func (d dbStor) CheckUniqOrder(ctx context.Context, u *model.User) error {
 	order := u.Orders[0]
 	var clientFromDB string
 	err := d.QueryRow(ctx, "SELECT client FROM market_orders WHERE id = $1", order.ID).Scan(&clientFromDB)
@@ -143,7 +143,7 @@ func (d dbStor) checkUniqOrder(ctx context.Context, u *model.User) error {
 	}
 }
 
-func (d dbStor) getAllOrdersByLogin(ctx context.Context, login *string) (*model.User, error) {
+func (d dbStor) GetAllOrdersByLogin(ctx context.Context, login *string) (*model.User, error) {
 	u := model.User{Info: model.UserInfo{Login: *login}}
 	orders := make([]model.Order, 0)
 
@@ -168,20 +168,20 @@ func (d dbStor) getAllOrdersByLogin(ctx context.Context, login *string) (*model.
 	return &u, nil
 }
 
-func (d dbStor) getBalanceWithdraw(ctx context.Context, login *string) (*model.BalanceResp, error) {
+func (d dbStor) GetBalanceWithdraw(ctx context.Context, login *string) (*model.BalanceResp, error) {
 	b := &model.BalanceResp{}
 	var err error
-	if b.Balance, err = d.getUBalance(ctx, login); err != nil {
+	if b.Balance, err = d.GetUBalance(ctx, login); err != nil {
 		return b, fmt.Errorf("error while get balance: %w", err)
 	}
-	if b.Sum, err = d.getSumOfWithdraws(ctx, login); err != nil {
+	if b.Sum, err = d.GetSumOfWithdraws(ctx, login); err != nil {
 		return b, fmt.Errorf("error while get sum withdraws: %w", err)
 	}
 	return b, err
 
 }
 
-func (d dbStor) getUBalance(ctx context.Context, login *string) (float64, error) {
+func (d dbStor) GetUBalance(ctx context.Context, login *string) (float64, error) {
 	var balance float64
 
 	err := d.QueryRow(ctx, "SELECT balance FROM  market_ubalance WHERE client = $1", *login).Scan(&balance)
@@ -192,7 +192,7 @@ func (d dbStor) getUBalance(ctx context.Context, login *string) (float64, error)
 	return balance, nil
 }
 
-func (d dbStor) getSumOfWithdraws(ctx context.Context, login *string) (float64, error) {
+func (d dbStor) GetSumOfWithdraws(ctx context.Context, login *string) (float64, error) {
 	var withdraw float64
 
 	//TODO обработать ошибку если сканим NULL
@@ -204,8 +204,8 @@ func (d dbStor) getSumOfWithdraws(ctx context.Context, login *string) (float64, 
 	return withdraw, nil
 }
 
-func (d dbStor) addNewOderWithdraw(ctx context.Context, u *model.User) error {
-	if err := d.addNewOrder(ctx, u); err != nil {
+func (d dbStor) AddNewOderWithdraw(ctx context.Context, u *model.User) error {
+	if err := d.AddNewOrder(ctx, u); err != nil {
 		if apperrors.Status(err) != 202 {
 			return err
 		}
@@ -218,27 +218,27 @@ func (d dbStor) addNewOderWithdraw(ctx context.Context, u *model.User) error {
 			return fmt.Errorf("eroror while creating new order: %w", err)
 		}
 	}
-	if err := d.updateUBalance(ctx, u); err != nil {
+	if err := d.UpdateUBalance(ctx, u); err != nil {
 		return fmt.Errorf("error while updating balance")
 	}
 
 	return apperrors.NewAccepted()
 
 }
-func (d dbStor) updateUBalance(ctx context.Context, u *model.User) error {
+func (d dbStor) UpdateUBalance(ctx context.Context, u *model.User) error {
 
 	err := d.QueryRow(ctx, "UPDATE market_ubalance SET balance = $1 WHERE client = $2", u.Balance, u.Info.Login).Scan()
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
-			return fmt.Errorf("eroror while creating new order: %w", err)
+			return fmt.Errorf("eroror while updating balance: %w", err)
 		}
 	}
 
 	return nil
 }
 
-func (d dbStor) getAllWithdrawsByLogin(ctx context.Context, login *string) (*model.User, error) {
+func (d dbStor) GetAllWithdrawsByLogin(ctx context.Context, login *string) (*model.User, error) {
 	u := model.User{Info: model.UserInfo{Login: *login}}
 	withdraws := make([]model.Withdraw, 0)
 
@@ -261,4 +261,52 @@ func (d dbStor) getAllWithdrawsByLogin(ctx context.Context, login *string) (*mod
 
 	u.Withdraws = withdraws
 	return &u, nil
+}
+func (d dbStor) CollectOrders(ctx context.Context) ([]model.Order, error) {
+
+	orders := make([]model.Order, 0)
+
+	col, err := d.Query(ctx, "SELECT id, status FROM market_orders WHERE status = $1 or status = $2 ", model.NEW, model.PROCESSED)
+	if err != nil {
+		return nil, fmt.Errorf("error while sending query to db : %w", err)
+	}
+
+	for col.Next() {
+		order := model.Order{}
+		if err := col.Scan(&order.ID, &order.Status); err != nil {
+			return orders, fmt.Errorf("error file scanning resp from db: %w", err)
+		}
+		orders = append(orders, order)
+	}
+	return orders, nil
+
+}
+
+func (d dbStor) UpdateOrders(ctx context.Context, order model.Order) error {
+
+	err := d.QueryRow(ctx, "UPDATE market_orders SET status = $1, accrual = $2 WHERE id = $3", order.Status, order.Accrual, order.ID).Scan()
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			return fmt.Errorf("error while sending query to db: %w", err)
+		}
+	}
+	return d.updateBalanceWithAccrual(ctx, order.Accrual, order.ID)
+}
+
+func (d dbStor) updateBalanceWithAccrual(ctx context.Context, accrual float64, order string) error {
+
+	err := d.QueryRow(ctx, "UPDATE market_ubalance SET balance = balance + $1 WHERE client = (SELECT client FROM market_orders WHERE id = $2)", accrual, order).Scan()
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			return fmt.Errorf("eroror while updating balance with accrual: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func (db dbStor) Close(ctx context.Context) {
+	db.Close(ctx)
 }
