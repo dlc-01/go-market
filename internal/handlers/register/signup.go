@@ -14,7 +14,7 @@ import (
 func Register(ginC *gin.Context) {
 	var req model.AuthReq
 	var err error
-	if err, invalidArgs := handlers.BindData(ginC, &req); err != nil {
+	if invalidArgs, err := handlers.BindData(ginC, &req); err != nil {
 		logger.Infof("cannot bind data %s", err)
 		if apperrors.Status(err) == http.StatusBadRequest {
 			ginC.AbortWithStatusJSON(apperrors.Status(err), gin.H{

@@ -131,10 +131,24 @@ func (m *TestStore) AddNewOderWithdraw(ctx context.Context, u *model.User) error
 	return apperrors.NewAccepted()
 }
 func (m *TestStore) CollectOrders(ctx context.Context) ([]model.Order, error) {
-	return nil, nil
+	ret := m.Called(ctx)
+	var r0 []model.Order
+	if ret.Get(0) != nil {
+		r0 = ret.Get(0).([]model.Order)
+	}
+
+	return r0, nil
 }
 func (m *TestStore) UpdateOrders(ctx context.Context, order model.Order) error {
-	return nil
+	ret := m.Called(ctx)
+	var r0 model.Order
+	if ret.Get(0) != nil {
+		r0 = ret.Get(0).(model.Order)
+	}
+	if r0 == order {
+		return nil
+	}
+	return apperrors.NewInternal()
 }
 func (m *TestStore) Close(ctx context.Context) {
 

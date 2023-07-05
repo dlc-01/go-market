@@ -15,14 +15,14 @@ type invalidArgument struct {
 	Param string
 }
 
-func BindData(ginC *gin.Context, req interface{}) (error, []invalidArgument) {
+func BindData(ginC *gin.Context, req interface{}) ([]invalidArgument, error) {
 
 	if err := CheckContentType(ginC, "application/json"); err != nil {
 
 		ginC.AbortWithStatusJSON(apperrors.Status(err), gin.H{
 			"error": err,
 		})
-		return apperrors.NewUnsupportedMediaType("content type not support"), []invalidArgument{}
+		return nil, apperrors.NewUnsupportedMediaType("content type not support")
 	}
 
 	if err := ginC.ShouldBind(req); err != nil {
@@ -41,10 +41,10 @@ func BindData(ginC *gin.Context, req interface{}) (error, []invalidArgument) {
 				})
 			}
 
-			return apperrors.NewBadRequest("Invalid request parameters. See invalidArgs"), invalidArgs
+			return invalidArgs, apperrors.NewBadRequest("Invalid request parameters. See invalidArgs")
 		}
 
-		return apperrors.NewInternal(), []invalidArgument{}
+		return nil, apperrors.NewInternal()
 	}
-	return nil, []invalidArgument{}
+	return nil, nil
 }

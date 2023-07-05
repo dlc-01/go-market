@@ -307,6 +307,6 @@ func (d dbStor) updateBalanceWithAccrual(ctx context.Context, accrual float64, o
 	return nil
 }
 
-func (db dbStor) Close(ctx context.Context) {
-	db.Close(ctx)
+func (d dbStor) Close(ctx context.Context) {
+	d.Pool.Close()
 }

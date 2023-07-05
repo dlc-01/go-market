@@ -58,28 +58,7 @@ func workAccrual(ordersR chan []model.Order, ordersS chan model.Order, cfg *conf
 				logger.Errorf("error while unmarshal data %s", err)
 			}
 
-			switch externalData.Status {
-			case model.NEW:
-				if order.Status == model.NEW {
-					continue
-				}
-			case model.PROCESSING:
-				if order.Status == model.NEW {
-					externalData.Accrual = 0
-					ordersS <- externalData
-
-				} else {
-					continue
-				}
-
-			case model.PROCESSED:
-				externalData.Accrual = 0
-				ordersS <- externalData
-
-			case model.INVALID:
-				externalData.Accrual = 0
-				ordersS <- externalData
-			}
+			ordersS <- externalData
 			time.Sleep(1 * time.Second)
 		}
 	}
