@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/dlc/go-market/internal/config"
+	"github.com/dlc/go-market/internal/logger"
 	"github.com/dlc/go-market/internal/model"
 )
 
@@ -74,6 +75,7 @@ func CollectOrders(ctx context.Context) ([]model.Order, error) {
 }
 
 func UpdateOrders(ctx context.Context, order model.Order) error {
+	logger.Info(fmt.Sprintf("update orderd :%v", order))
 	return stor.UpdateOrders(ctx, order)
 }
 
