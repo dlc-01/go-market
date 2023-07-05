@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/dlc/go-market/internal/config"
 	"github.com/dlc/go-market/internal/logger"
 	"github.com/dlc/go-market/internal/model"
@@ -55,7 +56,7 @@ func workAccrual(ordersR chan []model.Order, ordersS chan model.Order, cfg *conf
 
 			var externalData model.Order
 			err = json.Unmarshal(buf.Bytes(), &externalData)
-			logger.Info(order.ID)
+			logger.Info(fmt.Sprintf("data order id %s, accrual %v, status %s", externalData.ID, externalData.Accrual, externalData.Status))
 			if err != nil {
 				logger.Errorf("error while unmarshal data %s", err)
 			}
