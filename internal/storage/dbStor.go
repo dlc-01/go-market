@@ -286,7 +286,10 @@ func (d dbStor) UpdateOrders(ctx context.Context, order model.Order) error {
 
 	err := d.QueryRow(ctx, "UPDATE market_orders SET status = $1, accrual = $2 WHERE id = $3", order.Status, order.Accrual, order.ID).Scan()
 	if err != nil {
-		return fmt.Errorf("error while sending query to db: %w", err)
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			return fmt.Errorf("error while sending query to db: %w", err)
+		}
 	}
 
 	if err := d.updateBalanceWithAccrual(ctx, order.Accrual, order.ID); err != nil {
