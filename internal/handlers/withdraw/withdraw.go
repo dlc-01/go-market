@@ -67,6 +67,7 @@ func WithdrawalOfFunds(ginC *gin.Context) {
 	}
 
 	if balance < req.Sum {
+		logger.Infof("%v", balance)
 		err := apperrors.NewPaymentRequired("balance < sum of order")
 		ginC.AbortWithStatusJSON(apperrors.Status(err), gin.H{
 			"error": err,
