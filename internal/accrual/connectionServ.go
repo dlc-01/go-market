@@ -56,8 +56,10 @@ func workAccrual(ordersR chan []model.Order, ordersS chan model.Order, cfg *conf
 			var externalData model.Order
 			err = json.Unmarshal(buf.Bytes(), &externalData)
 
+			if err != nil {
+				logger.Errorf("error while unmarshal data %s", err)
+			}
 			externalData.ID = order.ID
-
 			ordersS <- externalData
 
 		}
