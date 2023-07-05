@@ -31,6 +31,6 @@ func Run(cfg *config.ServerConfig) {
 
 	router.GET("/api/user/balance", balance.ShowBalance)
 	router.POST("/api/user/balance/withdraw", withdraw.WithdrawalOfFunds)
-	router.GET("/api/user/withdraws", withdraw.GetAllWithdraws)
+	router.GET("/api/user/withdrawals", withdraw.GetAllWithdraws)
 	router.Run(cfg.ServerAddress)
 }

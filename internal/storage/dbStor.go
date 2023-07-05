@@ -222,7 +222,7 @@ func (d dbStor) AddNewOderWithdraw(ctx context.Context, u *model.User) error {
 		return fmt.Errorf("error while updating balance")
 	}
 
-	return apperrors.NewAccepted()
+	return apperrors.NewStatusOK()
 
 }
 func (d dbStor) UpdateUBalance(ctx context.Context, u *model.User) error {
@@ -302,9 +302,10 @@ func (d dbStor) updateBalanceWithAccrual(ctx context.Context, accrual float64, o
 
 	err := d.QueryRow(ctx, "UPDATE market_ubalance SET balance = balance + $1 WHERE client = (SELECT client FROM market_orders WHERE id = $2)", accrual, order).Scan()
 	if err != nil {
-
-		return fmt.Errorf("eroror while updating balance with accrual: %w", err)
-
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			return fmt.Errorf("eroror while updating balance with accrual: %w", err)
+		}
 	}
 
 	return nil
