@@ -140,7 +140,7 @@ func (m *TestStore) CollectOrders(ctx context.Context) ([]model.Order, error) {
 	return r0, nil
 }
 func (m *TestStore) UpdateOrders(ctx context.Context, order model.Order) error {
-	ret := m.Called(ctx)
+	ret := m.Called(ctx, order)
 	var r0 model.Order
 	if ret.Get(0) != nil {
 		r0 = ret.Get(0).(model.Order)

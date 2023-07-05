@@ -7,6 +7,7 @@ import (
 	"github.com/dlc/go-market/internal/config"
 	"github.com/dlc/go-market/internal/logger"
 	"github.com/dlc/go-market/internal/model"
+	"github.com/dlc/go-market/internal/storage"
 	"github.com/go-resty/resty/v2"
 	"net/http"
 	"time"
@@ -17,8 +18,8 @@ const ordersChanSize = 1000
 var (
 	zero    float64 = 0
 	client          = resty.New()
-	ordersR         = make(chan []model.Order, ordersChanSize)
-	ordersS         = make(chan model.Order, ordersChanSize)
+	ordersR         = make(chan []model.Order, 0)
+	ordersS         = make(chan model.Order, 0)
 )
 
 func ListenOtherServ(ctx context.Context, cfg *config.ServerConfig) {
@@ -29,7 +30,7 @@ func ListenOtherServ(ctx context.Context, cfg *config.ServerConfig) {
 	go saveOrder(ctx, ordersS)
 }
 
-func workAccrual(ordersR chan []model.Order, ordersS chan model.Order, cfg *config.ServerConfig, c *resty.Client) {
+func workAccrual(ordersR chan []model.Order, ordersS chan model.Order, cfg *config.ServerConfig, client *resty.Client) {
 	for orders := range ordersR {
 		for _, order := range orders {
 			client.SetTimeout(time.Second)
@@ -57,9 +58,12 @@ func workAccrual(ordersR chan []model.Order, ordersS chan model.Order, cfg *conf
 			if err != nil {
 				logger.Errorf("error while unmarshal data %s", err)
 			}
-
+			//TODO не работает
 			ordersS <- externalData
-			time.Sleep(1 * time.Second)
+
+			if err := storage.UpdateOrders(context.Background(), externalData); err != nil {
+				logger.Errorf("cannot update order :%s", err)
+			}
 		}
 	}
 }

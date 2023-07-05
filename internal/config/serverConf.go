@@ -23,7 +23,7 @@ func ParseFlagOs() (*ServerConfig, error) {
 	flag.StringVar(&cfg.DBAddress, "d", "postgres://localhost:5432", "server address")
 	flag.StringVar(&cfg.SecretKey, "k", "qwerty12345aszx", "key for hashing")
 	flag.StringVar(&cfg.AccrualAddress, "r", "http://localhost:8081", "address accrual")
-	flag.IntVar(&cfg.Poll, "p", 5, "Poll interval")
+	flag.IntVar(&cfg.Poll, "p", 2, "Poll interval")
 	flag.Parse()
 
 	if envServer := os.Getenv("RUN_ADDRESS"); envServer != "" {

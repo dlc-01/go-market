@@ -291,7 +291,11 @@ func (d dbStor) UpdateOrders(ctx context.Context, order model.Order) error {
 			return fmt.Errorf("error while sending query to db: %w", err)
 		}
 	}
-	return d.updateBalanceWithAccrual(ctx, order.Accrual, order.ID)
+
+	if err := d.updateBalanceWithAccrual(ctx, order.Accrual, order.ID); err != nil {
+		return fmt.Errorf("error while sending query to db: %w", err)
+	}
+	return nil
 }
 
 func (d dbStor) updateBalanceWithAccrual(ctx context.Context, accrual float64, order string) error {
