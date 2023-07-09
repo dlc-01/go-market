@@ -205,29 +205,41 @@ func (d dbStor) GetSumOfWithdraws(ctx context.Context, login *string) (float64, 
 }
 
 func (d dbStor) AddNewOderWithdraw(ctx context.Context, u *model.User) error {
-	if err := d.AddNewOrder(ctx, u); err != nil {
-		if apperrors.Status(err) != 202 {
-			return err
-		}
+	tx, err := d.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("error while starting transaction: %w", err)
 	}
-	withdraw := u.Withdraws[0]
-	err := d.QueryRow(ctx, "INSERT INTO market_withdraws (client, order_id, amount, time_created) VALUES ($1, $2, $3, $4)", u.Info.Login, withdraw.Order, withdraw.Sum, withdraw.TimeCreated).Scan()
+	defer tx.Rollback(ctx)
+	var balance float64
+
+	err = tx.QueryRow(ctx, "SELECT balance FROM  market_ubalance WHERE client = $1", u.Info.Login).Scan(&balance)
+	if err != nil {
+		return fmt.Errorf("error while scanning query to db : %w", err)
+	}
+
+	if balance < u.Withdraws[0].Sum {
+		return apperrors.NewPaymentRequired("balance < sum of order")
+	}
+
+	order := u.Orders[0]
+	err = tx.QueryRow(ctx, "INSERT INTO market_orders (id, client, status, accrual, time_created) VALUES ($1, $2, $3, $4, $5)", order.ID, u.Info.Login, order.Status, order.Accrual, order.TimeCreated).Scan()
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			return fmt.Errorf("eroror while creating new order: %w", err)
 		}
 	}
-	if err := d.UpdateUBalance(ctx, u); err != nil {
-		return fmt.Errorf("error while updating balance")
+
+	withdraw := u.Withdraws[0]
+	err = tx.QueryRow(ctx, "INSERT INTO market_withdraws (client, order_id, amount, time_created) VALUES ($1, $2, $3, $4)", u.Info.Login, withdraw.Order, withdraw.Sum, withdraw.TimeCreated).Scan()
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			return fmt.Errorf("eroror while creating new order: %w", err)
+		}
 	}
 
-	return apperrors.NewStatusOK()
-
-}
-func (d dbStor) UpdateUBalance(ctx context.Context, u *model.User) error {
-
-	err := d.QueryRow(ctx, "UPDATE market_ubalance SET balance = $1 WHERE client = $2", u.Balance, u.Info.Login).Scan()
+	err = tx.QueryRow(ctx, "UPDATE market_ubalance SET balance = balance - $1 WHERE client = $2", withdraw.Sum, u.Info.Login).Scan()
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
@@ -235,7 +247,13 @@ func (d dbStor) UpdateUBalance(ctx context.Context, u *model.User) error {
 		}
 	}
 
-	return nil
+	err = tx.Commit(ctx)
+	if err != nil {
+		return fmt.Errorf("eroror while commiting transaction: %w", err)
+	}
+
+	return apperrors.NewStatusOK()
+
 }
 
 func (d dbStor) GetAllWithdrawsByLogin(ctx context.Context, login *string) (*model.User, error) {
@@ -266,7 +284,7 @@ func (d dbStor) CollectOrders(ctx context.Context) ([]model.Order, error) {
 
 	orders := make([]model.Order, 0)
 
-	col, err := d.Query(ctx, "SELECT id, status FROM market_orders WHERE status = $1 or status = $2 ", model.NEW, model.PROCESSED)
+	col, err := d.Query(ctx, "SELECT id, status FROM market_orders WHERE status = $1 or status = $2 ", model.NEW, model.PROCESSING)
 	if err != nil {
 		return nil, fmt.Errorf("error while sending query to db : %w", err)
 	}
@@ -283,8 +301,13 @@ func (d dbStor) CollectOrders(ctx context.Context) ([]model.Order, error) {
 }
 
 func (d dbStor) UpdateOrders(ctx context.Context, order model.Order) error {
+	tx, err := d.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("error while starting transaction: %w", err)
+	}
+	defer tx.Rollback(ctx)
 
-	err := d.QueryRow(ctx, "UPDATE market_orders SET status = $1, accrual = $2 WHERE id = $3", order.Status, order.Accrual, order.ID).Scan()
+	err = tx.QueryRow(ctx, "UPDATE market_orders SET status = $1, accrual = $2 WHERE id = $3", order.Status, order.Accrual, order.ID).Scan()
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
@@ -292,15 +315,8 @@ func (d dbStor) UpdateOrders(ctx context.Context, order model.Order) error {
 		}
 	}
 
-	if err := d.updateBalanceWithAccrual(ctx, order.Accrual, order.ID); err != nil {
-		return fmt.Errorf("error while sending query to db: %w", err)
-	}
-	return nil
-}
-
-func (d dbStor) updateBalanceWithAccrual(ctx context.Context, accrual float64, order string) error {
-
-	err := d.QueryRow(ctx, "UPDATE market_ubalance SET balance = balance + $1 WHERE client = (SELECT client FROM market_orders WHERE id = $2)", accrual, order).Scan()
+	var client string
+	err = tx.QueryRow(ctx, "SELECT client FROM market_orders WHERE id = $1", order.ID).Scan(&client)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
@@ -308,6 +324,18 @@ func (d dbStor) updateBalanceWithAccrual(ctx context.Context, accrual float64, o
 		}
 	}
 
+	err = tx.QueryRow(ctx, "UPDATE market_ubalance SET balance = balance + $1 WHERE client =  $2", order.Accrual, client).Scan()
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			return fmt.Errorf("eroror while updating balance with accrual: %w", err)
+		}
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return fmt.Errorf("eroror while commiting transaction: %w", err)
+	}
 	return nil
 }
 

@@ -66,9 +66,8 @@ func NewOrder(ginC *gin.Context) {
 		if apperrors.Status(err) < 300 {
 			ginC.AbortWithStatus(apperrors.Status(err))
 			return
-		} else if apperrors.Status(err) == 500 {
-			logger.Errorf("error while adding new order: %s", err)
 		}
+		logger.Errorf("error while adding new order: %s", err)
 		ginC.AbortWithStatusJSON(apperrors.Status(err), gin.H{
 			"error": err,
 		})

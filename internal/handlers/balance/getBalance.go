@@ -7,6 +7,7 @@ import (
 	"github.com/dlc/go-market/internal/model/apperrors"
 	"github.com/dlc/go-market/internal/storage"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func ShowBalance(ginC *gin.Context) {
@@ -29,5 +30,5 @@ func ShowBalance(ginC *gin.Context) {
 		return
 	}
 
-	ginC.AbortWithStatusJSON(apperrors.Status(apperrors.NewStatusOK()), &resp)
+	ginC.AbortWithStatusJSON(http.StatusOK, &resp)
 }

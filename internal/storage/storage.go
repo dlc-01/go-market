@@ -13,7 +13,6 @@ type UserStorage interface {
 	FindByLogin(ctx context.Context, login *string) (*model.UserInfo, error)
 	AddNewOrder(ctx context.Context, u *model.User) error
 	GetAllOrdersByLogin(ctx context.Context, login *string) (*model.User, error)
-	GetUBalance(ctx context.Context, login *string) (float64, error)
 	GetBalanceWithdraw(ctx context.Context, login *string) (*model.BalanceResp, error)
 	AddNewOderWithdraw(ctx context.Context, u *model.User) error
 	GetAllWithdrawsByLogin(ctx context.Context, login *string) (*model.User, error)
@@ -55,10 +54,6 @@ func GetAllOrdersByLogin(ctx context.Context, login *string) (*model.User, error
 
 func GetUserBalanceWithdraw(ctx context.Context, login *string) (*model.BalanceResp, error) {
 	return stor.GetBalanceWithdraw(ctx, login)
-}
-
-func GetUserBalance(ctx context.Context, login *string) (float64, error) {
-	return stor.GetUBalance(ctx, login)
 }
 
 func AddNewOderWithdraw(ctx context.Context, u *model.User) error {

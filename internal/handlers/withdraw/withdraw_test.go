@@ -69,7 +69,7 @@ func TestAddWithdraw(t *testing.T) {
 			status:      http.StatusPaymentRequired,
 		},
 		{
-			name:        "balance < 0 ",
+			name:        "sum < 0 ",
 			user:        &model.User{Info: model.UserInfo{Login: "bob"}, Withdraws: []model.Withdraw{model.Withdraw{Order: "4029177534", Sum: -10}}},
 			userS:       &model.User{Info: model.UserInfo{Login: ""}, Withdraws: []model.Withdraw{}, Balance: 0},
 			ContentType: "application/json",
@@ -86,8 +86,7 @@ func TestAddWithdraw(t *testing.T) {
 			}
 
 			mockUserService := new(storage.TestStore)
-			mockUserService.On("getUBalance", mock.AnythingOfType("*gin.Context"), mock.AnythingOfType("*string")).Return(tt.userS.Balance, nil)
-			mockUserService.On("addNewOderWithdraw", mock.AnythingOfType("*gin.Context"), mock.AnythingOfType("*model.User")).Return(nil, nil)
+			mockUserService.On("AddNewOderWithdraw", mock.AnythingOfType("*gin.Context"), mock.AnythingOfType("*model.User")).Return(tt.userS, nil)
 
 			rr := httptest.NewRecorder()
 			storage.InitTestStorage(mockUserService)

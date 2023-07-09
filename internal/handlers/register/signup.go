@@ -42,6 +42,5 @@ func Register(ginC *gin.Context) {
 	}
 
 	auth.SetToken(ginC, u)
-	ginC.AbortWithStatus(apperrors.Status(apperrors.NewStatusOK()))
-
+	ginC.AbortWithStatus(http.StatusOK)
 }

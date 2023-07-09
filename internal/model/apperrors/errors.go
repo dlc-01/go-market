@@ -16,7 +16,7 @@ const (
 	NotFound             typeCode = "NOTFOUND"
 	ServiceUnavailable   typeCode = "SERVICE_UNAVAILABLE"
 	UnsupportedMediaType typeCode = "UNSUPPORTED_MEDIA_TYPE"
-	UnprocessablContent  typeCode = "UNPROCESSABLE_CONTENT"
+	UnprocessableContent typeCode = "UNPROCESSABLE_CONTENT"
 	StatusOK             typeCode = "STATUS_OK"
 	Accepted             typeCode = "ACCEPTED"
 	NoContent            typeCode = "NO_CONTENT"
@@ -54,7 +54,7 @@ func (e *Error) Status() int {
 		return http.StatusServiceUnavailable
 	case UnsupportedMediaType:
 		return http.StatusUnsupportedMediaType
-	case UnprocessablContent:
+	case UnprocessableContent:
 		return http.StatusUnprocessableEntity
 	default:
 		return http.StatusInternalServerError
@@ -104,13 +104,6 @@ func NewNotFound(name string, value string) *Error {
 	}
 }
 
-func NewServiceUnavailable() *Error {
-	return &Error{
-		TypCode: ServiceUnavailable,
-		Message: "Service unavailable or timed out",
-	}
-}
-
 func NewUnsupportedMediaType(reason string) *Error {
 	return &Error{
 		TypCode: UnsupportedMediaType,
@@ -119,7 +112,7 @@ func NewUnsupportedMediaType(reason string) *Error {
 }
 func NewUnprocessableContent(reason string) *Error {
 	return &Error{
-		TypCode: UnprocessablContent,
+		TypCode: UnprocessableContent,
 		Message: fmt.Sprintf("Unprocessable Content. Reasone: %v", reason),
 	}
 }

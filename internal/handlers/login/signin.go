@@ -16,7 +16,7 @@ func Login(ginC *gin.Context) {
 	var req model.AuthReq
 
 	if invalidArgs, err := handlers.BindData(ginC, &req); err != nil {
-		logger.Infof("cannot bind data %s", err)
+		logger.Errorf("cannot bind data %s", err)
 		if apperrors.Status(err) == http.StatusBadRequest {
 			ginC.AbortWithStatusJSON(apperrors.Status(err), gin.H{
 				"error":       err,
@@ -44,7 +44,7 @@ func Login(ginC *gin.Context) {
 	}
 
 	if err := hash.CheckPassword(req.Password, u.Password); err != nil {
-		logger.Infof("wrong password %s", err)
+		logger.Errorf("wrong password %s", err)
 		ginC.AbortWithStatusJSON(apperrors.Status(err), gin.H{
 			"error": err,
 		})

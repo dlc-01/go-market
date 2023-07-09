@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"github.com/dlc/go-market/internal/logger"
 	"github.com/dlc/go-market/internal/model/apperrors"
 
 	"github.com/gin-gonic/gin"
@@ -26,7 +25,6 @@ func BindData(ginC *gin.Context, req interface{}) ([]invalidArgument, error) {
 	}
 
 	if err := ginC.ShouldBind(req); err != nil {
-		logger.Errorf("error binding data: %s", err)
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
 

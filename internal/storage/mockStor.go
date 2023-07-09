@@ -128,6 +128,15 @@ func (m *TestStore) GetAllWithdrawsByLogin(ctx context.Context, login *string) (
 }
 
 func (m *TestStore) AddNewOderWithdraw(ctx context.Context, u *model.User) error {
+	ret := m.Called(ctx, u)
+
+	var r0 *model.User
+	if ret.Get(0) != nil {
+		r0 = ret.Get(0).(*model.User)
+	}
+	if r0.Balance < u.Withdraws[0].Sum {
+		return apperrors.NewPaymentRequired("balance < sum")
+	}
 	return apperrors.NewAccepted()
 }
 func (m *TestStore) CollectOrders(ctx context.Context) ([]model.Order, error) {
@@ -141,6 +150,7 @@ func (m *TestStore) CollectOrders(ctx context.Context) ([]model.Order, error) {
 }
 func (m *TestStore) UpdateOrders(ctx context.Context, order model.Order) error {
 	ret := m.Called(ctx, order)
+
 	var r0 model.Order
 	if ret.Get(0) != nil {
 		r0 = ret.Get(0).(model.Order)

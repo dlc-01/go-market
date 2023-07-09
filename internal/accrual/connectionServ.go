@@ -15,27 +15,28 @@ import (
 const ordersChanSize = 1000
 
 var (
-	zero    float64 = 0
-	client          = resty.New()
-	ordersR         = make(chan []model.Order, ordersChanSize)
-	ordersS         = make(chan model.Order, ordersChanSize)
+	zero          float64 = 0
+	client                = resty.New()
+	ordersRequest         = make(chan []model.Order, ordersChanSize)
+	ordersSave            = make(chan model.Order, ordersChanSize)
 )
 
 func ListenOtherServ(ctx context.Context, cfg *config.ServerConfig) {
 	logger.Info("start routine")
 	poolTicker := time.NewTicker(time.Second * time.Duration(cfg.Poll))
-	go collectOrders(ctx, ordersR, poolTicker)
-	go workAccrual(ordersR, ordersS, cfg, client)
-	go saveOrder(ctx, ordersS)
+	go collectOrders(ctx, ordersRequest, poolTicker)
+	go workAccrual(ordersRequest, ordersSave, cfg, client)
+	go saveOrder(ctx, ordersSave)
 }
 
-func workAccrual(ordersR chan []model.Order, ordersS chan model.Order, cfg *config.ServerConfig, client *resty.Client) {
-	for orders := range ordersR {
+func workAccrual(ordersRequest chan []model.Order, ordersSave chan model.Order, cfg *config.ServerConfig, client *resty.Client) {
+	for orders := range ordersRequest {
 		for _, order := range orders {
 			client.SetTimeout(time.Second)
 			resp, err := client.R().Get(cfg.AccrualAddress + "/api/orders/" + order.ID)
 			if err != nil {
 				logger.Errorf("error while sending resp to accrual: %s", err)
+				return
 			}
 			if resp.StatusCode() == http.StatusNoContent {
 				logger.Infof("order %s not found in accrual ", order.ID)
@@ -60,7 +61,7 @@ func workAccrual(ordersR chan []model.Order, ordersS chan model.Order, cfg *conf
 				logger.Errorf("error while unmarshal data %s", err)
 			}
 			externalData.ID = order.ID
-			ordersS <- externalData
+			ordersSave <- externalData
 
 		}
 	}
