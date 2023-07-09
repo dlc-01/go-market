@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/dlc/go-market/internal/model/apperrors"
+
 	"github.com/gin-gonic/gin"
+
+	"github.com/dlc/go-market/internal/model/apperrors"
 )
 
 func CheckContentType(ginC *gin.Context, types string) error {

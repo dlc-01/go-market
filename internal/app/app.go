@@ -1,6 +1,8 @@
 package app
 
 import (
+	"github.com/gin-gonic/gin"
+
 	"github.com/dlc/go-market/internal/auth"
 	"github.com/dlc/go-market/internal/config"
 	"github.com/dlc/go-market/internal/gzip"
@@ -10,7 +12,6 @@ import (
 	"github.com/dlc/go-market/internal/handlers/register"
 	"github.com/dlc/go-market/internal/handlers/withdraw"
 	"github.com/dlc/go-market/internal/logger"
-	"github.com/gin-gonic/gin"
 )
 
 func Run(cfg *config.ServerConfig) {

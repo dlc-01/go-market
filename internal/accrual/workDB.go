@@ -2,10 +2,11 @@ package accrual
 
 import (
 	"context"
+	"time"
+
 	"github.com/dlc/go-market/internal/logger"
 	"github.com/dlc/go-market/internal/model"
 	"github.com/dlc/go-market/internal/storage"
-	"time"
 )
 
 func collectOrders(ctx context.Context, ordersRequest chan<- []model.Order, poolTicker *time.Ticker) {

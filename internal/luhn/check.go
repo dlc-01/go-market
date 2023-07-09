@@ -2,8 +2,9 @@ package luhn
 
 import (
 	"fmt"
-	"github.com/dlc/go-market/internal/model/apperrors"
 	"strconv"
+
+	"github.com/dlc/go-market/internal/model/apperrors"
 )
 
 func ValidIDErr(numberS string) error {

@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"github.com/dlc/go-market/internal/model/apperrors"
-
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+
+	"github.com/dlc/go-market/internal/model/apperrors"
 )
 
 type invalidArgument struct {

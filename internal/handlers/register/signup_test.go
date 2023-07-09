@@ -3,16 +3,18 @@ package register
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/dlc/go-market/internal/logger"
-	"github.com/dlc/go-market/internal/model"
-	"github.com/dlc/go-market/internal/storage"
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
+	"github.com/dlc/go-market/internal/logger"
+	"github.com/dlc/go-market/internal/model"
+	"github.com/dlc/go-market/internal/storage"
 )
 
 func TestHConfig_SingUP2(t *testing.T) {

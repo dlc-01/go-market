@@ -1,11 +1,13 @@
 package auth
 
 import (
-	"github.com/dlc/go-market/internal/logger"
-	"github.com/dlc/go-market/internal/model"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"net/http"
+
+	"github.com/dlc/go-market/internal/logger"
+	"github.com/dlc/go-market/internal/model"
 )
 
 var secretK string

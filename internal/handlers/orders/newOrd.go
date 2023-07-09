@@ -2,14 +2,16 @@ package orders
 
 import (
 	"bytes"
+	"time"
+
+	"github.com/gin-gonic/gin"
+
 	"github.com/dlc/go-market/internal/handlers"
 	"github.com/dlc/go-market/internal/logger"
 	"github.com/dlc/go-market/internal/luhn"
 	"github.com/dlc/go-market/internal/model"
 	"github.com/dlc/go-market/internal/model/apperrors"
 	"github.com/dlc/go-market/internal/storage"
-	"github.com/gin-gonic/gin"
-	"time"
 )
 
 func NewOrder(ginC *gin.Context) {

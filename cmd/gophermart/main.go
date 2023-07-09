@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
+	"log"
+
 	"github.com/dlc/go-market/internal/accrual"
 	"github.com/dlc/go-market/internal/app"
 	"github.com/dlc/go-market/internal/config"
 	"github.com/dlc/go-market/internal/logger"
 	"github.com/dlc/go-market/internal/storage"
-	"log"
 )
 
 func main() {

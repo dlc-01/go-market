@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"net/http"
+	"time"
+
+	"github.com/go-resty/resty/v2"
+
 	"github.com/dlc/go-market/internal/config"
 	"github.com/dlc/go-market/internal/logger"
 	"github.com/dlc/go-market/internal/model"
-	"github.com/go-resty/resty/v2"
-	"net/http"
-	"time"
 )
 
 const ordersChanSize = 1000

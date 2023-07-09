@@ -2,11 +2,13 @@ package storage
 
 import (
 	"context"
+	"sync"
+
+	"github.com/stretchr/testify/mock"
+
 	"github.com/dlc/go-market/internal/config"
 	"github.com/dlc/go-market/internal/model"
 	"github.com/dlc/go-market/internal/model/apperrors"
-	"github.com/stretchr/testify/mock"
-	"sync"
 )
 
 type TestStore struct {

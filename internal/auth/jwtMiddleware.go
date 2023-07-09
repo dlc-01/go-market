@@ -3,11 +3,13 @@ package auth
 import (
 	"errors"
 	"fmt"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/dlc/go-market/internal/logger"
 	"github.com/dlc/go-market/internal/model"
 	"github.com/dlc/go-market/internal/model/apperrors"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 func AuthMidlleware() gin.HandlerFunc {

@@ -3,20 +3,22 @@ package orders
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/dlc/go-market/internal/auth"
-	"github.com/dlc/go-market/internal/logger"
-	"github.com/dlc/go-market/internal/model"
-	"github.com/dlc/go-market/internal/storage"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
+	"github.com/dlc/go-market/internal/auth"
+	"github.com/dlc/go-market/internal/logger"
+	"github.com/dlc/go-market/internal/model"
+	"github.com/dlc/go-market/internal/storage"
 )
 
 func TestGetAllOrders(t *testing.T) {

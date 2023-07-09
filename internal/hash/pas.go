@@ -2,8 +2,10 @@ package hash
 
 import (
 	"fmt"
-	"github.com/dlc/go-market/internal/model/apperrors"
+
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/dlc/go-market/internal/model/apperrors"
 )
 
 func HashPassword(password string) (string, error) {
