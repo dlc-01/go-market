@@ -112,8 +112,7 @@ func (d dbStor) AddNewOrder(ctx context.Context, u *model.User) error {
 	if err := d.CheckUniqOrder(ctx, u); err != nil {
 		return err
 	}
-	order := u.Orders[0]
-	err := d.QueryRow(ctx, "INSERT INTO market_orders (id, client, status, accrual, time_created) VALUES ($1, $2, $3, $4, $5)", order.ID, u.Info.Login, order.Status, order.Accrual, order.TimeCreated).Scan()
+	err := d.QueryRow(ctx, "INSERT INTO market_orders (id, client, status, accrual, time_created) VALUES ($1, $2, $3, $4, $5)", u.Orders[0].ID, u.Info.Login, u.Orders[0].Status, u.Orders[0].Accrual, u.Orders[0].TimeCreated).Scan()
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
@@ -221,8 +220,7 @@ func (d dbStor) AddNewOderWithdraw(ctx context.Context, u *model.User) error {
 		return apperrors.NewPaymentRequired("balance < sum of order")
 	}
 
-	order := u.Orders[0]
-	err = tx.QueryRow(ctx, "INSERT INTO market_orders (id, client, status, accrual, time_created) VALUES ($1, $2, $3, $4, $5)", order.ID, u.Info.Login, order.Status, order.Accrual, order.TimeCreated).Scan()
+	err = tx.QueryRow(ctx, "INSERT INTO market_orders (id, client, status, accrual, time_created) VALUES ($1, $2, $3, $4, $5)", u.Orders[0].ID, u.Info.Login, u.Orders[0].Status, u.Orders[0].Accrual, u.Orders[0].TimeCreated).Scan()
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
@@ -230,8 +228,7 @@ func (d dbStor) AddNewOderWithdraw(ctx context.Context, u *model.User) error {
 		}
 	}
 
-	withdraw := u.Withdraws[0]
-	err = tx.QueryRow(ctx, "INSERT INTO market_withdraws (client, order_id, amount, time_created) VALUES ($1, $2, $3, $4)", u.Info.Login, withdraw.Order, withdraw.Sum, withdraw.TimeCreated).Scan()
+	err = tx.QueryRow(ctx, "INSERT INTO market_withdraws (client, order_id, amount, time_created) VALUES ($1, $2, $3, $4)", u.Info.Login, u.Withdraws[0].Order, u.Withdraws[0].Sum, u.Withdraws[0].TimeCreated).Scan()
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
@@ -239,7 +236,7 @@ func (d dbStor) AddNewOderWithdraw(ctx context.Context, u *model.User) error {
 		}
 	}
 
-	err = tx.QueryRow(ctx, "UPDATE market_ubalance SET balance = balance - $1 WHERE client = $2", withdraw.Sum, u.Info.Login).Scan()
+	err = tx.QueryRow(ctx, "UPDATE market_ubalance SET balance = balance - $1 WHERE client = $2", u.Withdraws[0].Sum, u.Info.Login).Scan()
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
