@@ -211,7 +211,7 @@ func (d dbStor) AddNewOderWithdraw(ctx context.Context, u *model.User) error {
 	defer tx.Rollback(ctx)
 	var balance float64
 
-	err = tx.QueryRow(ctx, "SELECT balance FROM  market_ubalance WHERE client = $1", u.Info.Login).Scan(&balance)
+	err = tx.QueryRow(ctx, "SELECT balance FROM  market_ubalance WHERE client = $1 FOR UPDATE", u.Info.Login).Scan(&balance)
 	if err != nil {
 		return fmt.Errorf("error while scanning query to db : %w", err)
 	}
@@ -313,7 +313,7 @@ func (d dbStor) UpdateOrders(ctx context.Context, order model.Order) error {
 	}
 
 	var client string
-	err = tx.QueryRow(ctx, "SELECT client FROM market_orders WHERE id = $1", order.ID).Scan(&client)
+	err = tx.QueryRow(ctx, "SELECT client FROM market_orders WHERE id = $1 FOR UPDATE", order.ID).Scan(&client)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
